@@ -38,36 +38,41 @@ if ($systemVCPKG)
     vcpkg update # Not really functional it seems yet
     cd $currentDir
 }
-elseif (Test-Path "..\..\vcpkg")
-{
-    cd ..\..\vcpkg
-    $env:Path += ";" + $(Get-Location)
-    $vcpkgDir = $(Get-Location)
-    [Environment]::SetEnvironmentVariable("VCPKGDir", $env:vcpkgDir, [EnvironmentVariableTarget]::User)
-    echo "vcpkg already installed locally, updating"
-    # Update and rebuild vcpkg
-    git pull
-    # git checkout 7b7908b
-    bootstrap-vcpkg.bat
-    # Remove any outdated packages (they will be installed again below)
-    vcpkg remove --outdated --recurse
-    vcpkg update
-    cd $currentDir
-}
 else
 {
-    cd ..\..
-    echo "vcpkg missing, downloading and installing..."
-    git clone --depth 1 http://github.com/Microsoft/vcpkg.git
-    cd vcpkg
-    git checkout 7b7908b
-    $env:Path += ";" + $(Get-Location)
-    $vcpkgDir = $(Get-Location)
-    [Environment]::SetEnvironmentVariable("VCPKGDir", $env:vcpkgDir, [EnvironmentVariableTarget]::User)
-    bootstrap-vcpkg.bat
-    vcpkg integrate install
-    cd $currentDir
+    echo "system vcpkg not found, exiting"
+    Exit
 }
+# elseif (Test-Path "..\..\vcpkg")
+# {
+    # cd ..\..\vcpkg
+    # $env:Path += ";" + $(Get-Location)
+    # $vcpkgDir = $(Get-Location)
+    # [Environment]::SetEnvironmentVariable("VCPKGDir", $env:vcpkgDir, [EnvironmentVariableTarget]::User)
+    # echo "vcpkg already installed locally, updating"
+    ## Update and rebuild vcpkg
+    # git pull
+    ## git checkout 7b7908b
+    # bootstrap-vcpkg.bat
+    ## Remove any outdated packages (they will be installed again below)
+    # vcpkg remove --outdated --recurse
+    # vcpkg update
+    # cd $currentDir
+# }
+# else
+# {
+    # cd ..\..
+    # echo "vcpkg missing, downloading and installing..."
+    # git clone --depth 1 http://github.com/Microsoft/vcpkg.git
+    # cd vcpkg
+    # git checkout 7b7908b
+    # $env:Path += ";" + $(Get-Location)
+    # $vcpkgDir = $(Get-Location)
+    # [Environment]::SetEnvironmentVariable("VCPKGDir", $env:vcpkgDir, [EnvironmentVariableTarget]::User)
+    # bootstrap-vcpkg.bat
+    # vcpkg integrate install
+    # cd $currentDir
+# }
 
 # Generate VCPKG AlwaysAllowDownloads file if needed
 New-Item -type file $vcpkgDir\downloads\AlwaysAllowDownloads -errorAction SilentlyContinue | Out-Null
